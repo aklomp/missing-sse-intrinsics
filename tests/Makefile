@@ -2,13 +2,13 @@ CFLAGS += -std=c99 -Wall -Wextra -Werror -pedantic -msse2 -O3
 
 .PHONY: all clean
 
-all: exhaustive_8bit
+all: exhaustive_8bit exhaustive_16bit
 
-exhaustive_8bit: exhaustive_8bit.o
+exhaustive_%bit: exhaustive_%bit.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
-exhaustive_8bit.o: exhaustive_8bit.c ../lib/*.h
+exhaustive_%bit.o: exhaustive_%bit.c ../lib/*.h
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
-	rm -f *.o exhaustive_8bit
+	rm -f *.o exhaustive_{8,16}bit
