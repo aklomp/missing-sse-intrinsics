@@ -54,7 +54,7 @@ test_epu8_two (char *name, __m128i (*op_epu8)(__m128i a, __m128i b, uint8_t i, u
 			}
 			// Does the expected result differ?
 			if (buf[0] != expect) {
-				printf("FAIL: %d %s %d\n", i, op, j);
+				printf("FAIL: %d %s %d, expected %d, got %d\n", i, op, j, expect, buf[0]);
 				pass = false;
 				continue;
 			}

@@ -53,7 +53,7 @@ test_epu16_two (char *name, __m128i (*op_epu16)(__m128i a, __m128i b, uint16_t i
 			}
 			// Does the expected result differ?
 			if (buf[0] != expect) {
-				printf("FAIL: %d %s %d\n", i, op, j);
+				printf("FAIL: %d %s %d, expected %d, got %d\n", i, op, j, expect, buf[0]);
 				pass = false;
 				continue;
 			}
