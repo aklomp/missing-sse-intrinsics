@@ -1,3 +1,4 @@
 *.o
+bswap
 exhaustive_8bit
 exhaustive_16bit
