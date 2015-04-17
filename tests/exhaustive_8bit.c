@@ -73,7 +73,7 @@ do_mm_cmplt_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, c
 	return _mm_cmplt_epu8(a, b);
 }
 static bool
-test_mm_cmplt_epu8 ()
+test_mm_cmplt_epu8 (void)
 {
 	return test_epu8_two("_mm_cmplt_epu8", do_mm_cmplt_epu8);
 }
@@ -88,7 +88,7 @@ do_mm_cmple_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, c
 	return _mm_cmple_epu8(a, b);
 }
 static bool
-test_mm_cmple_epu8 ()
+test_mm_cmple_epu8 (void)
 {
 	return test_epu8_two("_mm_cmple_epu8", do_mm_cmple_epu8);
 }
@@ -103,7 +103,7 @@ do_mm_cmpge_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, c
 	return _mm_cmpge_epu8(a, b);
 }
 static bool
-test_mm_cmpge_epu8 ()
+test_mm_cmpge_epu8 (void)
 {
 	return test_epu8_two("_mm_cmpge_epu8", do_mm_cmpge_epu8);
 }
@@ -119,7 +119,7 @@ do_mm_cmpgt_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, c
 
 }
 static bool
-test_mm_cmpgt_epu8 ()
+test_mm_cmpgt_epu8 (void)
 {
 	return test_epu8_two("_mm_cmpgt_epu8", do_mm_cmpgt_epu8);
 }
@@ -134,7 +134,7 @@ do_mm_absdiff_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect,
 	return _mm_absdiff_epu8(a, b);
 }
 static bool
-test_mm_absdiff_epu8 ()
+test_mm_absdiff_epu8 (void)
 {
 	return test_epu8_two("_mm_absdiff_epu8", do_mm_absdiff_epu8);
 }
@@ -150,7 +150,7 @@ do_mm_scale_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, c
 
 }
 static bool
-test_mm_scale_epu8 ()
+test_mm_scale_epu8 (void)
 {
 	return test_epu8_two("_mm_scale_epu8", do_mm_scale_epu8);
 }
@@ -158,7 +158,7 @@ test_mm_scale_epu8 ()
 // ---------------------------------------------------------------------------
 
 static bool
-test_mm_divfast_epu8 ()
+test_mm_divfast_epu8 (void)
 {
 	bool pass = true;
 
@@ -180,7 +180,7 @@ test_mm_divfast_epu8 ()
 // ---------------------------------------------------------------------------
 
 static bool
-test_mm_div_epu8 ()
+test_mm_div_epu8 (void)
 {
 	bool pass = true;
 
@@ -202,7 +202,7 @@ test_mm_div_epu8 ()
 // ---------------------------------------------------------------------------
 
 int
-main ()
+main (void)
 {
 	bool pass = false;
 

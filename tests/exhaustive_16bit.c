@@ -72,7 +72,7 @@ do_mm_cmplt_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expec
 	return _mm_cmplt_epu16(a, b);
 }
 static bool
-test_mm_cmplt_epu16 ()
+test_mm_cmplt_epu16 (void)
 {
 	return test_epu16_two("_mm_cmplt_epu16", do_mm_cmplt_epu16);
 }
@@ -87,7 +87,7 @@ do_mm_cmple_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expec
 	return _mm_cmple_epu16(a, b);
 }
 static bool
-test_mm_cmple_epu16 ()
+test_mm_cmple_epu16 (void)
 {
 	return test_epu16_two("_mm_cmple_epu16", do_mm_cmple_epu16);
 }
@@ -102,7 +102,7 @@ do_mm_cmpge_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expec
 	return _mm_cmpge_epu16(a, b);
 }
 static bool
-test_mm_cmpge_epu16 ()
+test_mm_cmpge_epu16 (void)
 {
 	return test_epu16_two("_mm_cmpge_epu16", do_mm_cmpge_epu16);
 }
@@ -117,7 +117,7 @@ do_mm_cmpgt_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expec
 	return _mm_cmpgt_epu16(a, b);
 }
 static bool
-test_mm_cmpgt_epu16 ()
+test_mm_cmpgt_epu16 (void)
 {
 	return test_epu16_two("_mm_cmpgt_epu16", do_mm_cmpgt_epu16);
 }
@@ -132,7 +132,7 @@ do_mm_min_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect,
 	return _mm_min_epu16(a, b);
 }
 static bool
-test_mm_min_epu16 ()
+test_mm_min_epu16 (void)
 {
 	return test_epu16_two("_mm_min_epu16", do_mm_min_epu16);
 }
@@ -147,7 +147,7 @@ do_mm_max_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect,
 	return _mm_max_epu16(a, b);
 }
 static bool
-test_mm_max_epu16 ()
+test_mm_max_epu16 (void)
 {
 	return test_epu16_two("_mm_max_epu16", do_mm_max_epu16);
 }
@@ -162,7 +162,7 @@ do_mm_absdiff_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *exp
 	return _mm_absdiff_epu16(a, b);
 }
 static bool
-test_mm_absdiff_epu16 ()
+test_mm_absdiff_epu16 (void)
 {
 	return test_epu16_two("_mm_absdiff_epu16", do_mm_absdiff_epu16);
 }
@@ -170,7 +170,7 @@ test_mm_absdiff_epu16 ()
 // ---------------------------------------------------------------------------
 
 static bool
-test_mm_div255_epu16 ()
+test_mm_div255_epu16 (void)
 {
 	bool pass = true;
 
@@ -190,7 +190,7 @@ test_mm_div255_epu16 ()
 // ---------------------------------------------------------------------------
 
 int
-main ()
+main (void)
 {
 	bool pass = false;
 
