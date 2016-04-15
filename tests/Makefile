@@ -2,11 +2,18 @@ CFLAGS += -std=c99 -Wall -Wextra -Werror -pedantic -msse2 -O3
 
 .PHONY: test clean
 
-# This target rebuilds and runs all tests:
-test: bswap clean exhaustive_8bit exhaustive_16bit
+PROGS = \
+  bswap \
+  exhaustive_8bit \
+  exhaustive_16bit
+
+# The default target rebuilds and runs all tests:
+test: clean all
 	./bswap
 	./exhaustive_8bit
 	./exhaustive_16bit
+
+all: $(PROGS)
 
 exhaustive_%bit: exhaustive_%bit.o
 	$(CC) $(LDFLAGS) -o $@ $^
@@ -27,4 +34,4 @@ bswap_ssse3.o: bswap_trampoline.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
-	rm -f *.o exhaustive_{8,16}bit
+	rm -f *.o $(PROGS)
