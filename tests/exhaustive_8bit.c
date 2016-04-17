@@ -13,48 +13,64 @@
 #include "../lib/mm_divfast_epu8.h"
 #include "../lib/mm_div_epu8.h"
 
+// Inputs to test function:
+struct testcase {
+	const uint8_t	i;	// First input value
+	const uint8_t	j;	// Second input value
+	uint8_t		expect;	// Expected output value
+};
+
+// Struct to define a simple testcase:
+struct test {
+	const char *name;
+	const char *op;
+	__m128i    (*run) (struct testcase *);
+};
+
 // Check if all 16 epu8's are identical:
 static bool
 epu8_all_same (uint8_t buf[16])
 {
-	for (int i = 1; i < 16; i++) {
-		if (buf[0] != buf[i]) {
+	for (int i = 1; i < 16; i++)
+		if (buf[0] != buf[i])
 			return false;
-		}
-	}
+
 	return true;
 }
 
 static bool
-test_epu8_two (char *name, __m128i (*op_epu8)(__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, char **op))
+test_epu8_two (struct test *test)
 {
-	char *op;
-	uint8_t expect;
 	uint8_t buf[16] __attribute__ ((aligned(16)));
 	bool pass = true;
 
-	puts(name);
+	puts(test->name);
 
 	for (int i = 0; i < 0x100; i++) {
 		for (int j = 0; j < 0x100; j++) {
-			__m128i a = _mm_set1_epi8(i);
-			__m128i b = _mm_set1_epi8(j);
 
-			// Run user-defined operation on a and b:
-			__m128i c = op_epu8(a, b, i, j, &expect, &op);
+			// Create testcase
+			struct testcase tc = {
+				.i = i,
+				.j = j,
+			};
+
+			// Run testcase:
+			__m128i c = test->run(&tc);
 
 			// Save result to array:
 			_mm_store_si128((__m128i *)buf, c);
 
 			// Check that all elements in the result are identical:
 			if (!epu8_all_same(buf)) {
-				printf("FAIL: %d %s %d, not all identical\n", i, op, j);
+				printf("FAIL: %d %s %d, not all identical\n", tc.i, test->op, tc.j);
 				pass = false;
 				continue;
 			}
+
 			// Does the expected result differ?
-			if (buf[0] != expect) {
-				printf("FAIL: %d %s %d, expected %d, got %d\n", i, op, j, expect, buf[0]);
+			if (buf[0] != tc.expect) {
+				printf("FAIL: %d %s %d, expected %d, got %d\n", tc.i, test->op, tc.j, tc.expect, buf[0]);
 				pass = false;
 				continue;
 			}
@@ -63,99 +79,59 @@ test_epu8_two (char *name, __m128i (*op_epu8)(__m128i a, __m128i b, uint8_t i, u
 	return pass;
 }
 
-// ---------------------------------------------------------------------------
+static __m128i
+test_mm_cmplt_epu8 (struct testcase *tc)
+{
+	tc->expect = (tc->i < tc->j) ? 0xFF : 0x00;
+	return _mm_cmplt_epu8(
+		_mm_set1_epi8(tc->i),
+		_mm_set1_epi8(tc->j));
+}
 
 static __m128i
-do_mm_cmplt_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, char **op)
+test_mm_cmple_epu8 (struct testcase *tc)
 {
-	*op = "<";
-	*expect = (i < j) ? 0xFF : 0x00;
-	return _mm_cmplt_epu8(a, b);
+	tc->expect = (tc->i <= tc->j) ? 0xFF : 0x00;
+	return _mm_cmple_epu8(
+		_mm_set1_epi8(tc->i),
+		_mm_set1_epi8(tc->j));
 }
-static bool
-test_mm_cmplt_epu8 (void)
-{
-	return test_epu8_two("_mm_cmplt_epu8", do_mm_cmplt_epu8);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_cmple_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, char **op)
+test_mm_cmpge_epu8 (struct testcase *tc)
 {
-	*op = "<=";
-	*expect = (i <= j) ? 0xFF : 0x00;
-	return _mm_cmple_epu8(a, b);
+	tc->expect = (tc->i >= tc->j) ? 0xFF : 0x00;
+	return _mm_cmpge_epu8(
+		_mm_set1_epi8(tc->i),
+		_mm_set1_epi8(tc->j));
 }
-static bool
-test_mm_cmple_epu8 (void)
-{
-	return test_epu8_two("_mm_cmple_epu8", do_mm_cmple_epu8);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_cmpge_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, char **op)
+test_mm_cmpgt_epu8 (struct testcase *tc)
 {
-	*op = ">=";
-	*expect = (i >= j) ? 0xFF : 0x00;
-	return _mm_cmpge_epu8(a, b);
+	tc->expect = (tc->i > tc->j) ? 0xFF : 0x00;
+	return _mm_cmpgt_epu8(
+		_mm_set1_epi8(tc->i),
+		_mm_set1_epi8(tc->j));
 }
-static bool
-test_mm_cmpge_epu8 (void)
-{
-	return test_epu8_two("_mm_cmpge_epu8", do_mm_cmpge_epu8);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_cmpgt_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, char **op)
+test_mm_absdiff_epu8 (struct testcase *tc)
 {
-	*op = ">";
-	*expect = (i > j) ? 0xFF : 0x00;
-	return _mm_cmpgt_epu8(a, b);
-
+	tc->expect = (tc->i > tc->j) ? (tc->i - tc->j) : (tc->j - tc->i);
+	return _mm_absdiff_epu8(
+		_mm_set1_epi8(tc->i),
+		_mm_set1_epi8(tc->j));
 }
-static bool
-test_mm_cmpgt_epu8 (void)
-{
-	return test_epu8_two("_mm_cmpgt_epu8", do_mm_cmpgt_epu8);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_absdiff_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, char **op)
+test_mm_scale_epu8 (struct testcase *tc)
 {
-	*op = "absdiff";
-	*expect = (i > j) ? (i - j) : (j - i);
-	return _mm_absdiff_epu8(a, b);
+	tc->expect = (tc->i * tc->j) / 255;
+	return _mm_scale_epu8(
+		_mm_set1_epi8(tc->i),
+		_mm_set1_epi8(tc->j));
 }
-static bool
-test_mm_absdiff_epu8 (void)
-{
-	return test_epu8_two("_mm_absdiff_epu8", do_mm_absdiff_epu8);
-}
-
-// ---------------------------------------------------------------------------
-
-static __m128i
-do_mm_scale_epu8 (__m128i a, __m128i b, uint8_t i, uint8_t j, uint8_t *expect, char **op)
-{
-	*op = "scale";
-	*expect = (i * j) / 255;
-	return _mm_scale_epu8(a, b);
-
-}
-static bool
-test_mm_scale_epu8 (void)
-{
-	return test_epu8_two("_mm_scale_epu8", do_mm_scale_epu8);
-}
-
-// ---------------------------------------------------------------------------
 
 static bool
 test_mm_divfast_epu8 (void)
@@ -177,8 +153,6 @@ test_mm_divfast_epu8 (void)
 	return pass;
 }
 
-// ---------------------------------------------------------------------------
-
 static bool
 test_mm_div_epu8 (void)
 {
@@ -199,20 +173,25 @@ test_mm_div_epu8 (void)
 	return pass;
 }
 
-// ---------------------------------------------------------------------------
-
 int
 main (void)
 {
-	bool pass = false;
+	// Map for testing simple bytewise functions:
+	struct test map[] = {
+		{ "_mm_cmplt_epu8",   "<",       test_mm_cmplt_epu8   },
+		{ "_mm_cmple_epu8",   "<=",      test_mm_cmple_epu8   },
+		{ "_mm_cmpge_epu8",   ">=",      test_mm_cmpge_epu8   },
+		{ "_mm_cmpgt_epu8",   ">",       test_mm_cmpgt_epu8   },
+		{ "_mm_absdiff_epu8", "absdiff", test_mm_absdiff_epu8 },
+		{ "_mm_scale_epu8",   "scale",   test_mm_scale_epu8   },
+	};
 
-	pass |= test_mm_cmplt_epu8();
-	pass |= test_mm_cmple_epu8();
-	pass |= test_mm_cmpge_epu8();
-	pass |= test_mm_cmpgt_epu8();
-	pass |= test_mm_absdiff_epu8();
-	pass |= test_mm_scale_epu8();
-	pass |= test_mm_div_epu8();
+	bool pass = true;
+
+	for (size_t i = 0; i < sizeof(map) / sizeof(map[0]); i++)
+		pass &= test_epu8_two(&map[i]);
+
+	pass &= test_mm_div_epu8();
 
 	// This function is inexact by design:
 	(void) test_mm_divfast_epu8();

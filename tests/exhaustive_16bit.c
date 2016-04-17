@@ -13,6 +13,20 @@
 #include "../lib/mm_absdiff_epu16.h"
 #include "../lib/mm_div255_epu16.h"
 
+// Inputs to test function:
+struct testcase {
+	const uint16_t	i;	// First input value
+	const uint16_t	j;	// Second input value
+	uint16_t	expect;	// Expected output value
+};
+
+// Struct to define a simple testcase:
+struct test {
+	const char *name;
+	const char *op;
+	__m128i    (*run) (struct testcase *);
+};
+
 // Check if all 8 epu16's are identical:
 static bool
 epu16_all_same (uint16_t buf[8])
@@ -26,34 +40,37 @@ epu16_all_same (uint16_t buf[8])
 }
 
 static bool
-test_epu16_two (char *name, __m128i (*op_epu16)(__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op))
+test_epu16_two (struct test *test)
 {
-	char *op;
-	uint16_t expect;
 	uint16_t buf[8] __attribute__ ((aligned(16)));
 	bool pass = true;
 
-	puts(name);
+	puts(test->name);
+
 	for (int i = 0; i < 0x10000; i++) {
 		for (int j = 0; j < 0x10000; j++) {
-			__m128i a = _mm_set1_epi16(i);
-			__m128i b = _mm_set1_epi16(j);
 
-			// Run user-defined operation on a and b:
-			__m128i c = op_epu16(a, b, i, j, &expect, &op);
+			// Create testcase
+			struct testcase tc = {
+				.i = i,
+				.j = j,
+			};
+
+			// Run testcase:
+			__m128i c = test->run(&tc);
 
 			// Save result to array:
 			_mm_store_si128((__m128i *)buf, c);
 
 			// Check that all elements in the result are identical:
 			if (!epu16_all_same(buf)) {
-				printf("FAIL: %d %s %d, not all identical\n", i, op, j);
+				printf("FAIL: %d %s %d, not all identical\n", tc.i, test->op, tc.j);
 				pass = false;
 				continue;
 			}
 			// Does the expected result differ?
-			if (buf[0] != expect) {
-				printf("FAIL: %d %s %d, expected %d, got %d\n", i, op, j, expect, buf[0]);
+			if (buf[0] != tc.expect) {
+				printf("FAIL: %d %s %d, expected %d, got %d\n", tc.i, test->op, tc.j, tc.expect, buf[0]);
 				pass = false;
 				continue;
 			}
@@ -62,112 +79,68 @@ test_epu16_two (char *name, __m128i (*op_epu16)(__m128i a, __m128i b, uint16_t i
 	return pass;
 }
 
-// ---------------------------------------------------------------------------
+static __m128i
+test_mm_cmplt_epu16 (struct testcase *tc)
+{
+	tc->expect = (tc->i < tc->j) ? 0xFFFF : 0x0000;
+	return _mm_cmplt_epu16(
+		_mm_set1_epi16(tc->i),
+		_mm_set1_epi16(tc->j));
+}
 
 static __m128i
-do_mm_cmplt_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op)
+test_mm_cmple_epu16 (struct testcase *tc)
 {
-	*op = "<";
-	*expect = (i < j) ? 0xFFFF : 0x0000;
-	return _mm_cmplt_epu16(a, b);
+	tc->expect = (tc->i <= tc->j) ? 0xFFFF : 0x0000;
+	return _mm_cmple_epu16(
+		_mm_set1_epi16(tc->i),
+		_mm_set1_epi16(tc->j));
 }
-static bool
-test_mm_cmplt_epu16 (void)
-{
-	return test_epu16_two("_mm_cmplt_epu16", do_mm_cmplt_epu16);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_cmple_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op)
+test_mm_cmpge_epu16 (struct testcase *tc)
 {
-	*op = "<=";
-	*expect = (i <= j) ? 0xFFFF : 0x0000;
-	return _mm_cmple_epu16(a, b);
+	tc->expect = (tc->i >= tc->j) ? 0xFFFF : 0x0000;
+	return _mm_cmpge_epu16(
+		_mm_set1_epi16(tc->i),
+		_mm_set1_epi16(tc->j));
 }
-static bool
-test_mm_cmple_epu16 (void)
-{
-	return test_epu16_two("_mm_cmple_epu16", do_mm_cmple_epu16);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_cmpge_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op)
+test_mm_cmpgt_epu16 (struct testcase *tc)
 {
-	*op = ">=";
-	*expect = (i >= j) ? 0xFFFF : 0x0000;
-	return _mm_cmpge_epu16(a, b);
+	tc->expect = (tc->i > tc->j) ? 0xFFFF : 0x0000;
+	return _mm_cmpgt_epu16(
+		_mm_set1_epi16(tc->i),
+		_mm_set1_epi16(tc->j));
 }
-static bool
-test_mm_cmpge_epu16 (void)
-{
-	return test_epu16_two("_mm_cmpge_epu16", do_mm_cmpge_epu16);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_cmpgt_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op)
+test_mm_min_epu16 (struct testcase *tc)
 {
-	*op = ">";
-	*expect = (i > j) ? 0xFFFF : 0x0000;
-	return _mm_cmpgt_epu16(a, b);
+	tc->expect = (tc->i > tc->j) ? tc->j : tc->i;
+	return _mm_min_epu16(
+		_mm_set1_epi16(tc->i),
+		_mm_set1_epi16(tc->j));
 }
-static bool
-test_mm_cmpgt_epu16 (void)
-{
-	return test_epu16_two("_mm_cmpgt_epu16", do_mm_cmpgt_epu16);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_min_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op)
+test_mm_max_epu16 (struct testcase *tc)
 {
-	*op = "min";
-	*expect = (i > j) ? j : i;
-	return _mm_min_epu16(a, b);
+	tc->expect = (tc->i > tc->j) ? tc->i : tc->j;
+	return _mm_max_epu16(
+		_mm_set1_epi16(tc->i),
+		_mm_set1_epi16(tc->j));
 }
-static bool
-test_mm_min_epu16 (void)
-{
-	return test_epu16_two("_mm_min_epu16", do_mm_min_epu16);
-}
-
-// ---------------------------------------------------------------------------
 
 static __m128i
-do_mm_max_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op)
+test_mm_absdiff_epu16 (struct testcase *tc)
 {
-	*op = "max";
-	*expect = (i > j) ? i : j;
-	return _mm_max_epu16(a, b);
+	tc->expect = (tc->i > tc->j) ? (tc->i - tc->j) : (tc->j - tc->i);
+	return _mm_absdiff_epu16(
+		_mm_set1_epi16(tc->i),
+		_mm_set1_epi16(tc->j));
 }
-static bool
-test_mm_max_epu16 (void)
-{
-	return test_epu16_two("_mm_max_epu16", do_mm_max_epu16);
-}
-
-// ---------------------------------------------------------------------------
-
-static __m128i
-do_mm_absdiff_epu16 (__m128i a, __m128i b, uint16_t i, uint16_t j, uint16_t *expect, char **op)
-{
-	*op = "absdiff";
-	*expect = (i > j) ? (i - j) : (j - i);
-	return _mm_absdiff_epu16(a, b);
-}
-static bool
-test_mm_absdiff_epu16 (void)
-{
-	return test_epu16_two("_mm_absdiff_epu16", do_mm_absdiff_epu16);
-}
-
-// ---------------------------------------------------------------------------
 
 static bool
 test_mm_div255_epu16 (void)
@@ -187,21 +160,27 @@ test_mm_div255_epu16 (void)
 	return pass;
 }
 
-// ---------------------------------------------------------------------------
-
 int
 main (void)
 {
-	bool pass = false;
+	// Map for testing simple bytewise functions:
+	struct test map[] = {
+		{ "_mm_cmplt_epu16",   "<",       test_mm_cmplt_epu16   },
+		{ "_mm_cmple_epu16",   "<=",      test_mm_cmple_epu16   },
+		{ "_mm_cmpge_epu16",   ">=",      test_mm_cmpge_epu16   },
+		{ "_mm_cmpgt_epu16",   ">",       test_mm_cmpgt_epu16   },
+		{ "_mm_min_epu16",     "min",     test_mm_min_epu16     },
+		{ "_mm_max_epu16",     "max",     test_mm_max_epu16     },
+		{ "_mm_absdiff_epu16", "absdiff", test_mm_absdiff_epu16 },
+	};
 
-	pass |= test_mm_cmplt_epu16();
-	pass |= test_mm_cmple_epu16();
-	pass |= test_mm_cmpge_epu16();
-	pass |= test_mm_cmpgt_epu16();
-	pass |= test_mm_min_epu16();
-	pass |= test_mm_max_epu16();
-	pass |= test_mm_absdiff_epu16();
-	pass |= test_mm_div255_epu16();
+	bool pass = true;
+
+	for (size_t i = 0; i < sizeof(map) / sizeof(map[0]); i++)
+		pass &= test_epu16_two(&map[i]);
+
+	// Handle this one separately:
+	pass &= test_mm_div255_epu16();
 
 	return (pass) ? 0 : 1;
 }
