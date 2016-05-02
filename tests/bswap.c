@@ -12,6 +12,13 @@ __m128i _mm_bswap_epi32_ssse3 (__m128i);
 __m128i _mm_bswap_epi64_ssse3 (__m128i);
 __m128i _mm_bswap_si128_ssse3 (__m128i);
 
+#define TESTCASE(__name, __input, __expect)	\
+	{ .name   = # __name			\
+	, .input  = __input			\
+	, .expect = __expect			\
+	, .func   = _mm_bswap_ ## __name	\
+	}
+
 static struct testcase {
 	char *name;
 	char *input;
@@ -20,47 +27,15 @@ static struct testcase {
 }
 testcases[] =
 {
-  { .name   = "epi16_sse2"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "BADCFEHGJILKNMOP"
-  , .func   = _mm_bswap_epi16_sse2
-  }
-, { .name   = "epi16_ssse3"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "BADCFEHGJILKNMOP"
-  , .func   = _mm_bswap_epi16_ssse3
-  }
-, { .name   = "epi32_sse2"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "DCBAHGFELKJIOPNM"
-  , .func   = _mm_bswap_epi32_sse2
-  }
-, { .name   = "epi32_ssse3"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "DCBAHGFELKJIOPNM"
-  , .func   = _mm_bswap_epi32_ssse3
-  }
-, { .name   = "epi64_sse2"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "HGFEDCBAOPNMLKJI"
-  , .func   = _mm_bswap_epi64_sse2
-  }
-, { .name   = "epi64_ssse3"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "HGFEDCBAOPNMLKJI"
-  , .func   = _mm_bswap_epi64_ssse3
-  }
-, { .name   = "si128_sse2"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "OPNMLKJIHGFEDCBA"
-  , .func   = _mm_bswap_si128_sse2
-  }
-, { .name   = "si128_ssse3"
-  , .input  = "ABCDEFGHIJKLMNPO"
-  , .expect = "OPNMLKJIHGFEDCBA"
-  , .func   = _mm_bswap_si128_ssse3
-  }
-} ;
+	TESTCASE (epi16_sse2,  "ABCDEFGHIJKLMNPO", "BADCFEHGJILKNMOP"),
+	TESTCASE (epi16_ssse3, "ABCDEFGHIJKLMNPO", "BADCFEHGJILKNMOP"),
+	TESTCASE (epi32_sse2,  "ABCDEFGHIJKLMNPO", "DCBAHGFELKJIOPNM"),
+	TESTCASE (epi32_ssse3, "ABCDEFGHIJKLMNPO", "DCBAHGFELKJIOPNM"),
+	TESTCASE (epi64_sse2,  "ABCDEFGHIJKLMNPO", "HGFEDCBAOPNMLKJI"),
+	TESTCASE (epi64_ssse3, "ABCDEFGHIJKLMNPO", "HGFEDCBAOPNMLKJI"),
+	TESTCASE (si128_sse2,  "ABCDEFGHIJKLMNPO", "OPNMLKJIHGFEDCBA"),
+	TESTCASE (si128_ssse3, "ABCDEFGHIJKLMNPO", "OPNMLKJIHGFEDCBA"),
+};
 
 static int
 run_testcase (struct testcase *t)
