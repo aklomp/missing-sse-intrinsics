@@ -32,9 +32,14 @@ form a pair, `x1` and `y1` form a pair, and so on.) With these new
 
 ## License
 
-These are fundamental building blocks as far as I'm concerned, and I wouldn't
-want to claim any rights to these. For what it's worth, I declare that I place
-these in the public domain. Do what you want with this stuff.
+Informally speaking, these are fundamental building blocks as far as I'm
+concerned, and I wouldn't want to claim any rights to these. For what it's
+worth, I declare that I place these in the public domain. Do what you want with
+this stuff.
+
+Formally speaking, this repo is released under the
+[Unlicense](https://unlicense.org/). The contents of this license can be found
+in the `LICENSE` file.
 
 ## This repository
 
