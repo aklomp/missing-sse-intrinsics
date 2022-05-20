@@ -1,8 +1,7 @@
+// Reverse the order of all bytes in each 64-bit word.
 static inline __m128i
 _mm_bswap_epi64 (__m128i x)
 {
-	// Reverse order of bytes in each 64-bit word.
-
 #ifdef __SSSE3__
 	return _mm_shuffle_epi8(x,
 		_mm_set_epi8(

@@ -1,4 +1,4 @@
-// Probably too big to want to inline:
+// Probably too big to want to inline.
 static __m128i
 _mm_divfast_epu8 (__m128i x, uint8_t d)
 {
