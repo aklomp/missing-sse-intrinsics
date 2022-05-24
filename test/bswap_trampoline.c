@@ -5,10 +5,7 @@
 #endif
 
 // Include inline function definitions:
-#include "../lib/mm_bswap_epi16.h"
-#include "../lib/mm_bswap_epi32.h"
-#include "../lib/mm_bswap_epi64.h"
-#include "../lib/mm_bswap_si128.h"
+#include "../missing_sse.h"
 
 // Machinery to create trampoline functions for different
 // word widths and instruction sets (SSE2 and SSSE3):

@@ -3,15 +3,7 @@
 #include <stdio.h>
 #include <emmintrin.h>
 
-#include "../lib/mm_cmpgt_epu8.h"
-#include "../lib/mm_cmplt_epu8.h"
-#include "../lib/mm_cmple_epu8.h"
-#include "../lib/mm_cmpge_epu8.h"
-#include "../lib/mm_absdiff_epu8.h"
-#include "../lib/mm_div255_epu16.h"
-#include "../lib/mm_scale_epu8.h"
-#include "../lib/mm_divfast_epu8.h"
-#include "../lib/mm_div_epu8.h"
+#include "../missing_sse.h"
 
 // Inputs to test function:
 struct testcase {
