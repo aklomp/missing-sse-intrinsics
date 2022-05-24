@@ -1,6 +1,6 @@
 # A few missing SSE intrinsics
 
-[![Build Status](https://travis-ci.org/aklomp/sse-intrinsics-tests.svg?branch=master)](https://travis-ci.org/aklomp/sse-intrinsics-tests)
+[![Test](https://github.com/aklomp/missing-sse-intrinsics/actions/workflows/test.yml/badge.svg)](https://github.com/aklomp/missing-sse-intrinsics/actions/workflows/test.yml)
 
 C and C++ programmers already have many
 [SSE intrinsics](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)
