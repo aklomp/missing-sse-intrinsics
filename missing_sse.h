@@ -120,14 +120,14 @@ _mm_blendv_epi8 (__m128i x, __m128i y, __m128i mask)
 static inline __m128i
 _mm_min_epu16 (__m128i x, __m128i y)
 {
-	return _mm_blendv_si128(y, x, _mm_cmple_epu16(x, y));
+	return _mm_sub_epi16(x, _mm_subs_epu16(x, y));
 }
 
 // Return x where x >= y, else y.
 static inline __m128i
 _mm_max_epu16 (__m128i x, __m128i y)
 {
-	return _mm_blendv_si128(x, y, _mm_cmple_epu16(x, y));
+	return _mm_add_epi16(x, _mm_subs_epu16(y, x));
 }
 #endif
 
