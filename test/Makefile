@@ -7,7 +7,7 @@ PROGS = \
   exhaustive_8bit \
   exhaustive_16bit
 
-# The default target rebuilds and runs all tests:
+# The default target rebuilds and runs all tests.
 test: clean all
 	./bswap
 	./exhaustive_8bit
@@ -24,14 +24,14 @@ exhaustive_%bit.o: exhaustive_%bit.c ../lib/*.h
 bswap: bswap.o bswap_sse2.o bswap_ssse3.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
-bswap_sse2.o: bswap_trampoline.c
-	$(CC) $(CFLAGS) -DFUNC_POSTFIX=sse2 -o $@ -c $<
+bswap_sse2.o:  CFLAGS += -DFUNC_POSTFIX=sse2
+bswap_ssse3.o: CFLAGS += -DFUNC_POSTFIX=ssse3 -mssse3
 
-bswap_ssse3.o: bswap_trampoline.c
-	$(CC) $(CFLAGS) -DFUNC_POSTFIX=ssse3 -mssse3 -o $@ -c $<
+bswap_%.o: bswap_trampoline.c
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 %.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean:
-	rm -f *.o $(PROGS)
+	$(RM) *.o $(PROGS)
