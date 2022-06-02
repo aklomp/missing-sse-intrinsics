@@ -14,4 +14,5 @@ jobs:
     - name: Run tests
       env:
         CC: ${{matrix.cc}}
-      run: make -C test
+      working-directory: test
+      run: make
