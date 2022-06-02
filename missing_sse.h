@@ -285,12 +285,10 @@ _mm_bswap_epi32 (__m128i x)
 			 4,  5,  6,  7,
 			 0,  1,  2,  3));
 #else
-	// First swap bytes in each 16-bit word:
-	__m128i a = _mm_or_si128(
-		_mm_slli_epi16(x, 8),
-		_mm_srli_epi16(x, 8));
+	// First swap bytes in each 16-bit word.
+	__m128i a = _mm_bswap_epi16(x);
 
-	// Then swap all 16-bit words:
+	// Then swap all 16-bit words.
 	a = _mm_shufflelo_epi16(a, _MM_SHUFFLE(2, 3, 0, 1));
 	a = _mm_shufflehi_epi16(a, _MM_SHUFFLE(2, 3, 0, 1));
 
@@ -310,12 +308,10 @@ _mm_bswap_epi64 (__m128i x)
 			 0,  1,  2,  3,
 			 4,  5,  6,  7));
 #else
-	// Swap bytes in each 16-bit word:
-	__m128i a = _mm_or_si128(
-		_mm_slli_epi16(x, 8),
-		_mm_srli_epi16(x, 8));
+	// Swap bytes in each 16-bit word.
+	__m128i a = _mm_bswap_epi16(x);
 
-	// Reverse all 16-bit words in 64-bit halves:
+	// Reverse all 16-bit words in 64-bit halves.
 	a = _mm_shufflelo_epi16(a, _MM_SHUFFLE(0, 1, 2, 3));
 	a = _mm_shufflehi_epi16(a, _MM_SHUFFLE(0, 1, 2, 3));
 
@@ -335,12 +331,10 @@ _mm_bswap_si128 (__m128i x)
 			 8,  9, 10, 11,
 			12, 13, 14, 15));
 #else
-	// Swap bytes in each 16-bit word:
-	__m128i a = _mm_or_si128(
-		_mm_slli_epi16(x, 8),
-		_mm_srli_epi16(x, 8));
+	// Swap bytes in each 16-bit word.
+	__m128i a = _mm_bswap_epi16(x);
 
-	// Reverse all 16-bit words in 64-bit halves:
+	// Reverse all 16-bit words in 64-bit halves.
 	a = _mm_shufflelo_epi16(a, _MM_SHUFFLE(0, 1, 2, 3));
 	a = _mm_shufflehi_epi16(a, _MM_SHUFFLE(0, 1, 2, 3));
 
